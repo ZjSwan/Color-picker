@@ -109,6 +109,10 @@ input {
   <input type="number" id="litresInput" min="1" placeholder="Enter litres needed">
 
   <div class="total" id="totalPrice"></div>
+
+  <button id="sendButton" style="margin-top:16px;padding:12px 18px;border:none;border-radius:12px;background:#25D366;color:white;font-size:16px;cursor:pointer;width:100%;display:none;">
+    Send Order on WhatsApp
+  </button>
 </div>
 
   </div>
@@ -135,6 +139,9 @@ input {
     const price20 = document.getElementById('price20');
     const litresInput = document.getElementById('litresInput');
     const totalPrice = document.getElementById('totalPrice');
+    const sendButton = document.getElementById('sendButton');
+
+    const whatsappNumber = '27764626566'; // Replace with your WhatsApp number including country code
 
     let selectedColor = null;
 
@@ -144,8 +151,21 @@ input {
       const litres = parseFloat(litresInput.value);
       if (!litres || litres <= 0) {
         totalPrice.textContent = '';
+        sendButton.style.display = 'none';
         return;
       }
+
+      const pricePerLitre = parseInt(selectedColor.prices.litre1.replace('R', ''));
+      const total = litres * pricePerLitre;
+
+      totalPrice.textContent = `Total Price: R${total}`;
+      sendButton.style.display = 'block';
+
+      sendButton.onclick = () => {
+        const message = `Hello, I would like to order:%0A%0AColor: ${selectedColor.name}%0ALitres: ${litres}%0ATotal Price: R${total}`;
+        window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+      };
+    }
 
       const pricePerLitre = parseInt(selectedColor.prices.litre1.replace('R', ''));
       const total = litres * pricePerLitre;
