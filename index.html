@@ -110,13 +110,11 @@ input {
 
   <div class="total" id="totalPrice"></div>
 
-  <button id="sendButton" style="margin-top:16px;padding:12px 18px;border:none;border-radius:12px;background:#25D366;color:white;font-size:16px;cursor:pointer;width:100%;display:none;">
+  <button id="sendButton" disabled style="margin-top:16px;padding:12px 18px;border:none;border-radius:12px;background:#25D366;color:white;font-size:16px;cursor:pointer;width:100%;opacity:0.5;">
     Send Order on WhatsApp
   </button>
 </div>
 
-  </div>
-  </div>
   </div>  <script>
     const colors = [
       { name: 'White', hex: '#ffffff', prices: { litre1: 'R120', litre5: 'R550', litre20: 'R2000' } },
@@ -141,7 +139,7 @@ input {
     const totalPrice = document.getElementById('totalPrice');
     const sendButton = document.getElementById('sendButton');
 
-    const whatsappNumber = '+27764626566'; // Replace with your WhatsApp number including country code
+    const whatsappNumber = '27764626566'; // Your WhatsApp number without the + sign
 
     let selectedColor = null;
 
@@ -151,7 +149,8 @@ input {
       const litres = parseFloat(litresInput.value);
       if (!litres || litres <= 0) {
         totalPrice.textContent = '';
-        sendButton.style.display = 'none';
+        sendButton.disabled = true;
+        sendButton.style.opacity = '0.5';
         return;
       }
 
@@ -159,7 +158,8 @@ input {
       const total = litres * pricePerLitre;
 
       totalPrice.textContent = `Total Price: R${total}`;
-      sendButton.style.display = 'block';
+      sendButton.disabled = false;
+      sendButton.style.opacity = '1';
 
       sendButton.onclick = () => {
         const message = `Hello, I would like to order:%0A%0AColor: ${selectedColor.name}%0ALitres: ${litres}%0ATotal Price: R${total}`;
@@ -167,12 +167,7 @@ input {
       };
     }
 
-      const pricePerLitre = parseInt(selectedColor.prices.litre1.replace('R', ''));
-      const total = litres * pricePerLitre;
-      totalPrice.textContent = `Total Price: R${total}`;
-    }
-
-    litresInput.addEventListener('input', updateTotal);
+      litresInput.addEventListener('input', updateTotal);
 
     colors.forEach(color => {
       const div = document.createElement('div');
