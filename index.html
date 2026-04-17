@@ -1,219 +1,232 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Color Picker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-    }.container {
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Color Picker Cart</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
   background: white;
-  padding: 24px;
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  max-width: 420px;
+  padding: 20px;
+  border-radius: 16px;
+  max-width: 450px;
   width: 100%;
-  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
 }
 
-h1 {
-  margin-top: 0;
-  font-size: 24px;
-}
-
-.instructions {
-  color: #666;
-  font-size: 14px;
-}
+h1 { margin-top: 0; }
 
 .palette {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-  margin: 24px 0;
+  gap: 10px;
+  margin: 15px 0;
 }
 
 .color {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  border: 3px solid transparent;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.2s, border 0.2s;
-  margin: auto;
-}
-
-.color:hover {
-  transform: scale(1.08);
+  border: 2px solid transparent;
 }
 
 .color.active {
-  border: 3px solid #222;
+  border: 3px solid #000;
 }
 
 .result {
-  margin-top: 20px;
-  padding: 16px;
-  border-radius: 14px;
-  background: #f7f7f7;
   display: none;
-}
-
-.result h2 {
-  margin: 0 0 8px;
-  font-size: 20px;
-}
-
-.price {
-  font-size: 18px;
-  margin: 10px 0;
-  color: #333;
-}
-
-.total {
-  font-size: 30px;
-  font-weight: bold;
-  color: #1f7a1f;
-  margin-top: 18px;
+  background: #f7f7f7;
+  padding: 12px;
+  border-radius: 12px;
 }
 
 input {
   width: 100%;
   padding: 10px;
+  margin-top: 10px;
   border-radius: 10px;
   border: 1px solid #ccc;
-  font-size: 16px;
-  margin-top: 14px;
-  box-sizing: border-box;
 }
 
-  </style>
+button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#addBtn { background: #333; color: white; }
+#sendBtn { background: #25D366; color: white; }
+
+.cart {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #ddd;
+}
+</style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>Choose Your Color</h1>
-    <p class="instructions">Tap a color to see the price.</p><div class="palette" id="palette"></div>
+
+<div class="container">
+
+<h1>Choose Color</h1>
+
+<div class="palette" id="palette"></div>
 
 <div class="result" id="result">
-  <h2 id="colorName"></h2>
-  <div class="price"><strong>1 Litre:</strong> <span id="price1"></span></div>
-  <div class="price"><strong>5 Litre:</strong> <span id="price5"></span></div>
-  <div class="price"><strong>20 Litre:</strong> <span id="price20"></span></div>
+  <h3 id="colorName"></h3>
 
-  <input type="number" id="litresInput" min="1" placeholder="Enter litres needed">
+  <input type="number" id="litres" placeholder="Enter litres"/>
 
-  <div class="total" id="totalPrice"></div>
+  <button id="addBtn">➕ Add to Cart</button>
 
-  <button id="sendButton" disabled style="margin-top:16px;padding:12px 18px;border:none;border-radius:12px;background:#25D366;color:white;font-size:16px;cursor:pointer;width:100%;opacity:0.5;">
-    Send Order on WhatsApp
-  </button>
+  <div class="cart" id="cart"></div>
+
+  <h3 id="total"></h3>
+
+  <button id="sendBtn">Send WhatsApp Order</button>
 </div>
 
-  </div>  <script>
-    const colors = [
-      { name: 'White', hex: '#ffffff', prices: { litre1: 'R120', litre5: 'R550', litre20: 'R2000' } },
-      { name: 'Black', hex: '#000000', prices: { litre1: 'R120', litre5: 'R550', litre20: 'R2000' } },
-      { name: 'Red', hex: '#e53935', prices: { litre1: 'R140', litre5: 'R650', litre20: 'R2400' } },
-      { name: 'Blue', hex: '#1e88e5', prices: { litre1: 'R140', litre5: 'R650', litre20: 'R2400' } },
-      { name: 'Green', hex: '#43a047', prices: { litre1: 'R140', litre5: 'R650', litre20: 'R2400' } },
-      { name: 'Yellow', hex: '#fdd835', prices: { litre1: 'R150', litre5: 'R700', litre20: 'R2600' } },
-      { name: 'Orange', hex: '#fb8c00', prices: { litre1: 'R150', litre5: 'R700', litre20: 'R2600' } },
-      { name: 'Grey', hex: '#757575', prices: { litre1: 'R130', litre5: 'R600', litre20: 'R2200' } },
-      { name: 'Brown', hex: '#6d4c41', prices: { litre1: 'R130', litre5: 'R600', litre20: 'R2200' } },
-      { name: 'Silver', hex: '#c0c0c0', prices: { litre1: 'R160', litre5: 'R750', litre20: 'R2800' } }
-    ];
+</div>
 
-    const palette = document.getElementById('palette');
-    const result = document.getElementById('result');
-    const colorName = document.getElementById('colorName');
-    const price1 = document.getElementById('price1');
-    const price5 = document.getElementById('price5');
-    const price20 = document.getElementById('price20');
-    const litresInput = document.getElementById('litresInput');
-    const totalPrice = document.getElementById('totalPrice');
-    const sendButton = document.getElementById('sendButton');
+<script>
+const colors = [
+  { name: "White", hex: "#ffffff", prices: [120, 550, 2000] },
+  { name: "Black", hex: "#000000", prices: [120, 550, 2000] },
+  { name: "Red", hex: "#e53935", prices: [140, 650, 2400] },
+  { name: "Blue", hex: "#1e88e5", prices: [140, 650, 2400] },
+  { name: "Green", hex: "#43a047", prices: [140, 650, 2400] }
+];
 
-    const whatsappNumber = '27764626566'; // Your WhatsApp number without the + sign
+let cart = [];
+let selectedColor = null;
 
-    let selectedColor = null;
+const palette = document.getElementById("palette");
+const result = document.getElementById("result");
+const colorName = document.getElementById("colorName");
+const litresInput = document.getElementById("litres");
+const cartBox = document.getElementById("cart");
+const totalBox = document.getElementById("total");
 
-function updateTotal() {
-  if (!selectedColor) return;
+const addBtn = document.getElementById("addBtn");
+const sendBtn = document.getElementById("sendBtn");
 
-  const litres = parseInt(litresInput.value);
-  if (!litres || litres <= 0) {
-    totalPrice.textContent = '';
-    sendButton.disabled = true;
-    sendButton.style.opacity = '0.5';
+// ---------- CALC ----------
+function calc(litres, color) {
+  let [p1, p5, p20] = color.prices;
+
+  let r = litres;
+
+  let b20 = Math.floor(r / 20);
+  r -= b20 * 20;
+
+  let b5 = Math.floor(r / 5);
+  r -= b5 * 5;
+
+  let b1 = r;
+
+  let total = (b20*p20) + (b5*p5) + (b1*p1);
+
+  return { total, b20, b5, b1 };
+}
+
+// ---------- RENDER CART ----------
+function renderCart() {
+  if (cart.length === 0) {
+    cartBox.innerHTML = "<p>Cart empty</p>";
     return;
   }
 
-  const price1 = parseInt(selectedColor.prices.litre1.replace('R', ''));
-  const price5 = parseInt(selectedColor.prices.litre5.replace('R', ''));
-  const price20 = parseInt(selectedColor.prices.litre20.replace('R', ''));
-
-  let remaining = litres;
-  let total = 0;
-
-  const buckets20 = Math.floor(remaining / 20);
-  const used20 = buckets20 * 20;
-  total += buckets20 * price20;
-  remaining -= used20;
-
-  const buckets5 = Math.floor(remaining / 5);
-  const used5 = buckets5 * 5;
-  total += buckets5 * price5;
-  remaining -= used5;
-
-  const buckets1 = remaining;
-  total += buckets1 * price1;
-
-  totalPrice.textContent = `Total Price: R${total}`;
-
-  sendButton.disabled = false;
-  sendButton.style.opacity = '1';
-
-  sendButton.onclick = () => {
-   const message = encodeURIComponent(
-  `🧾 New Order\n\n🎨 Color: ${selectedColor.name}\n📦 Litres: ${litres}\n\n📊 Breakdown:\n- 20L drums: ${buckets20}\n- 5L buckets: ${buckets5}\n- 1L units: ${buckets1}\n\n💰 Total: R${total}`
-);
-
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
-  };
+  cartBox.innerHTML = cart.map((item, i) =>
+    `<div class="item">
+      ${item.color} (${item.litres}L)
+      <span>R${item.total}</span>
+      <button onclick="removeItem(${i})">X</button>
+    </div>`
+  ).join("");
 }
-  litresInput.addEventListener('input', updateTotal);
 
-    colors.forEach(color => {
-      const div = document.createElement('div');
-      div.className = 'color';
-      div.style.background = color.hex;
+window.removeItem = (i) => {
+  cart.splice(i, 1);
+  renderCart();
+};
 
-      if (color.hex === '#ffffff') {
-        div.style.border = '1px solid #ccc';
-      }
+// ---------- COLORS ----------
+colors.forEach(c => {
+  const div = document.createElement("div");
+  div.className = "color";
+  div.style.background = c.hex;
 
-      div.onclick = () => {
-        document.querySelectorAll('.color').forEach(c => c.classList.remove('active'));
-        div.classList.add('active');
+  div.onclick = () => {
+    document.querySelectorAll(".color").forEach(x => x.classList.remove("active"));
+    div.classList.add("active");
 
-        selectedColor = color;
+    selectedColor = c;
 
-        colorName.textContent = color.name;
-        price1.textContent = color.prices.litre1;
-        price5.textContent = color.prices.litre5;
-        price20.textContent = color.prices.litre20;
-        result.style.display = 'block';
+    colorName.textContent = c.name;
+    result.style.display = "block";
+  };
 
-        updateTotal();
-      };
+  palette.appendChild(div);
+});
 
-      palette.appendChild(div);
-    });
-  </script></body>
+// ---------- ADD ----------
+addBtn.onclick = () => {
+  const litres = parseInt(litresInput.value);
+  if (!selectedColor || !litres) return;
+
+  const res = calc(litres, selectedColor);
+
+  cart.push({
+    color: selectedColor.name,
+    litres,
+    total: res.total
+  });
+
+  litresInput.value = "";
+  renderCart();
+};
+
+// ---------- SEND ----------
+sendBtn.onclick = () => {
+  if (cart.length === 0) return;
+
+  let totalAll = 0;
+
+  let msg =
+`🧾 NEW ORDER\n\n` +
+cart.map(i => {
+  totalAll += i.total;
+  return `🎨 ${i.color} - ${i.litres}L = R${i.total}`;
+}).join("\n") +
+`\n\n💰 TOTAL: R${totalAll}`;
+
+  window.open(
+    "https://wa.me/27764626566?text=" + encodeURIComponent(msg),
+    "_blank"
+  );
+};
+</script>
+
+</body>
 </html>
