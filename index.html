@@ -143,31 +143,51 @@ input {
 
     let selectedColor = null;
 
-    function updateTotal() {
-      if (!selectedColor) return;
+function updateTotal() {
+  if (!selectedColor) return;
 
-      const litres = parseFloat(litresInput.value);
-      if (!litres || litres <= 0) {
-        totalPrice.textContent = '';
-        sendButton.disabled = true;
-        sendButton.style.opacity = '0.5';
-        return;
-      }
+  const litres = parseInt(litresInput.value);
+  if (!litres || litres <= 0) {
+    totalPrice.textContent = '';
+    sendButton.disabled = true;
+    sendButton.style.opacity = '0.5';
+    return;
+  }
 
-      const pricePerLitre = parseInt(selectedColor.prices.litre1.replace('R', ''));
-      const total = litres * pricePerLitre;
+  const price1 = parseInt(selectedColor.prices.litre1.replace('R', ''));
+  const price5 = parseInt(selectedColor.prices.litre5.replace('R', ''));
+  const price20 = parseInt(selectedColor.prices.litre20.replace('R', ''));
 
-      totalPrice.textContent = `Total Price: R${total}`;
-      sendButton.disabled = false;
-      sendButton.style.opacity = '1';
+  let remaining = litres;
+  let total = 0;
 
-      sendButton.onclick = () => {
-        const message = `Hello, I would like to order:%0A%0AColor: ${selectedColor.name}%0ALitres: ${litres}%0ATotal Price: R${total}`;
-        window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
-      };
-    }
+  const buckets20 = Math.floor(remaining / 20);
+  const used20 = buckets20 * 20;
+  total += buckets20 * price20;
+  remaining -= used20;
 
-      litresInput.addEventListener('input', updateTotal);
+  const buckets5 = Math.floor(remaining / 5);
+  const used5 = buckets5 * 5;
+  total += buckets5 * price5;
+  remaining -= used5;
+
+  const buckets1 = remaining;
+  total += buckets1 * price1;
+
+  totalPrice.textContent = `Total Price: R${total}`;
+
+  sendButton.disabled = false;
+  sendButton.style.opacity = '1';
+
+  sendButton.onclick = () => {
+   const message = encodeURIComponent(
+  `🧾 New Order\n\n🎨 Color: ${selectedColor.name}\n📦 Litres: ${litres}\n\n📊 Breakdown:\n- 20L drums: ${buckets20}\n- 5L buckets: ${buckets5}\n- 1L units: ${buckets1}\n\n💰 Total: R${total}`
+);
+
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+  };
+}
+  litresInput.addEventListener('input', updateTotal);
 
     colors.forEach(color => {
       const div = document.createElement('div');
