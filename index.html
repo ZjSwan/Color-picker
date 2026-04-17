@@ -3,39 +3,50 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Color Picker Cart</title>
+<title>Danzel Paints</title>
 
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #f4f4f4;
+  background: white;
+  margin: 0;
   display: flex;
   justify-content: center;
   padding: 20px;
 }
 
 .container {
-  background: white;
-  padding: 20px;
-  border-radius: 16px;
-  max-width: 450px;
   width: 100%;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  max-width: 520px;
+  background: #F5FEEA;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
-h1 { margin-top: 0; }
+h1 {
+  margin: 0 0 5px;
+  font-size: 24px;
+}
+
+.sub {
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
 
 .palette {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 10px;
-  margin: 15px 0;
+  margin-bottom: 15px;
 }
 
 .color {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
   cursor: pointer;
   border: 2px solid transparent;
 }
@@ -44,43 +55,66 @@ h1 { margin-top: 0; }
   border: 3px solid #000;
 }
 
-.result {
-  display: none;
-  background: #f7f7f7;
+.panel {
+  background: #f6f6f6;
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 10px;
 }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+#danz{
+text-align: center;
+margin: 0 auto;
+color: #233311;
+}
+
+#litres {
+width: 96%;
+}
+
 
 input {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   margin-top: 10px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid #ccc;
 }
 
 button {
   width: 100%;
-  margin-top: 10px;
   padding: 10px;
+  margin-top: 10px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
 }
 
-#addBtn { background: #333; color: white; }
-#sendBtn { background: #25D366; color: white; }
-
-.cart {
-  margin-top: 10px;
-  font-size: 14px;
+.add {
+  background: #333;
+  color: #fff;
 }
 
-.item {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 0;
+.whatsapp {
+  background: #25D366;
+  color: #fff;
+}
+
+.cart-item {
+  font-size: 13px;
+  padding: 8px;
   border-bottom: 1px solid #ddd;
+}
+
+.save {
+  color: green;
+  font-size: 12px;
 }
 </style>
 </head>
@@ -89,143 +123,176 @@ button {
 
 <div class="container">
 
-<h1>Choose Color</h1>
+<h1 id="danz">Danzel Paints</h1>
+<p class="sub">Select a color and build your invoice</p>
 
 <div class="palette" id="palette"></div>
 
-<div class="result" id="result">
+<div class="panel" id="panel" style="display:none;">
+
   <h3 id="colorName"></h3>
 
-  <input type="number" id="litres" placeholder="Enter litres"/>
+  <div class="row"><span>1L</span><span id="p1"></span></div>
+  <div class="row"><span>5L</span><span id="p5"></span></div>
+  <div class="row"><span>20L</span><span id="p20"></span></div>
 
-  <button id="addBtn">➕ Add to Cart</button>
+  <input type="number" id="litres" placeholder="Enter litres">
 
-  <div class="cart" id="cart"></div>
+  <button class="add" id="addBtn">Add to Invoice</button>
 
-  <h3 id="total"></h3>
+  <div id="cart"></div>
 
-  <button id="sendBtn">Send WhatsApp Order</button>
+  <h3>Total: R<span id="total">0</span></h3>
+
+  <button class="whatsapp" id="send">Send Order</button>
+
 </div>
 
 </div>
 
 <script>
+
+// ---------------- COLORS ----------------
 const colors = [
-  { name: "White", hex: "#ffffff", prices: [120, 550, 2000] },
-  { name: "Black", hex: "#000000", prices: [120, 550, 2000] },
-  { name: "Red", hex: "#e53935", prices: [140, 650, 2400] },
-  { name: "Blue", hex: "#1e88e5", prices: [140, 650, 2400] },
-  { name: "Green", hex: "#43a047", prices: [140, 650, 2400] }
+{name:"White",hex:"#fff",p:120},
+{name:"Black",hex:"#000",p:120},
+{name:"Red",hex:"#e53935",p:140},
+{name:"Blue",hex:"#1e88e5",p:140},
+{name:"Green",hex:"#43a047",p:140},
+{name:"Yellow",hex:"#fdd835",p:150},
+{name:"Orange",hex:"#fb8c00",p:150},
+{name:"Grey",hex:"#757575",p:130},
+{name:"Brown",hex:"#6d4c41",p:130},
+{name:"Silver",hex:"#c0c0c0",p:160},
+{name:"Pink",hex:"#ec407a",p:150},
+{name:"Purple",hex:"#8e24aa",p:150},
+{name:"Cyan",hex:"#00acc1",p:140},
+{name:"Lime",hex:"#c0ca33",p:140},
+{name:"Navy",hex:"#1a237e",p:160}
 ];
 
+// ---------------- STATE ----------------
+let selected = null;
 let cart = [];
-let selectedColor = null;
 
+// ---------------- ELEMENTS ----------------
 const palette = document.getElementById("palette");
-const result = document.getElementById("result");
-const colorName = document.getElementById("colorName");
-const litresInput = document.getElementById("litres");
-const cartBox = document.getElementById("cart");
-const totalBox = document.getElementById("total");
+const panel = document.getElementById("panel");
+const nameEl = document.getElementById("colorName");
+const p1 = document.getElementById("p1");
+const p5 = document.getElementById("p5");
+const p20 = document.getElementById("p20");
+const litres = document.getElementById("litres");
+const cartEl = document.getElementById("cart");
+const totalEl = document.getElementById("total");
 
-const addBtn = document.getElementById("addBtn");
-const sendBtn = document.getElementById("sendBtn");
+// ---------------- TRUE DISCOUNT MODEL ----------------
+// 5L = 8% discount
+// 20L = 15% discount
 
-// ---------- CALC ----------
-function calc(litres, color) {
-  let [p1, p5, p20] = color.prices;
+function optimize(price1, litres) {
+
+  const price5 = price1 * 5 * 0.92;
+  const price20 = price1 * 20 * 0.85;
+
+  const normal = litres * price1;
 
   let r = litres;
 
-  let b20 = Math.floor(r / 20);
-  r -= b20 * 20;
+  const c20 = Math.floor(r / 20);
+  r %= 20;
 
-  let b5 = Math.floor(r / 5);
-  r -= b5 * 5;
+  const c5 = Math.floor(r / 5);
+  r %= 5;
 
-  let b1 = r;
+  const c1 = r;
 
-  let total = (b20*p20) + (b5*p5) + (b1*p1);
+  const bulk =
+    (c20 * price20) +
+    (c5 * price5) +
+    (c1 * price1);
 
-  return { total, b20, b5, b1 };
+  return {
+    total: Math.round(bulk),
+    savings: Math.round(normal - bulk)
+  };
 }
 
-// ---------- RENDER CART ----------
+// ---------------- CART ----------------
 function renderCart() {
-  if (cart.length === 0) {
-    cartBox.innerHTML = "<p>Cart empty</p>";
-    return;
-  }
+  let total = 0;
 
-  cartBox.innerHTML = cart.map((item, i) =>
-    `<div class="item">
-      ${item.color} (${item.litres}L)
-      <span>R${item.total}</span>
-      <button onclick="removeItem(${i})">X</button>
-    </div>`
-  ).join("");
+  cartEl.innerHTML = cart.map(i => {
+    total += i.total;
+    return `
+      <div class="cart-item">
+        ${i.name} - ${i.l}L = R${i.total}<br>
+        <span class="save">Saved R${i.save}</span>
+      </div>
+    `;
+  }).join("");
+
+  totalEl.innerText = total;
 }
 
-window.removeItem = (i) => {
-  cart.splice(i, 1);
-  renderCart();
-};
-
-// ---------- COLORS ----------
+// ---------------- COLOR SELECT ----------------
 colors.forEach(c => {
-  const div = document.createElement("div");
-  div.className = "color";
-  div.style.background = c.hex;
+  const d = document.createElement("div");
+  d.className = "color";
+  d.style.background = c.hex;
 
-  div.onclick = () => {
+  d.onclick = () => {
     document.querySelectorAll(".color").forEach(x => x.classList.remove("active"));
-    div.classList.add("active");
+    d.classList.add("active");
 
-    selectedColor = c;
+    selected = c;
+    panel.style.display = "block";
 
-    colorName.textContent = c.name;
-    result.style.display = "block";
+    nameEl.innerText = c.name;
+    p1.innerText = "R" + c.p;
+    p5.innerText = "R" + Math.round(c.p * 5 * 0.92);
+    p20.innerText = "R" + Math.round(c.p * 20 * 0.85);
   };
 
-  palette.appendChild(div);
+  palette.appendChild(d);
 });
 
-// ---------- ADD ----------
-addBtn.onclick = () => {
-  const litres = parseInt(litresInput.value);
-  if (!selectedColor || !litres) return;
+// ---------------- ADD TO CART ----------------
+document.getElementById("addBtn").onclick = () => {
+  const l = parseInt(litres.value);
+  if (!selected || !l) return;
 
-  const res = calc(litres, selectedColor);
+  const r = optimize(selected.p, l);
 
   cart.push({
-    color: selectedColor.name,
-    litres,
-    total: res.total
+    name: selected.name,
+    l,
+    total: r.total,
+    save: r.savings
   });
 
-  litresInput.value = "";
+  litres.value = "";
   renderCart();
 };
 
-// ---------- SEND ----------
-sendBtn.onclick = () => {
-  if (cart.length === 0) return;
+// ---------------- SEND ORDER ----------------
+document.getElementById("send").onclick = () => {
+  let msg = "DANZEL PAINTS ORDER\n\n";
+  let total = 0;
 
-  let totalAll = 0;
+  cart.forEach(i => {
+    total += i.total;
+    msg += `${i.name} - ${i.l}L = R${i.total} (Save R${i.save})\n`;
+  });
 
-  let msg =
-`🧾 NEW ORDER\n\n` +
-cart.map(i => {
-  totalAll += i.total;
-  return `🎨 ${i.color} - ${i.litres}L = R${i.total}`;
-}).join("\n") +
-`\n\n💰 TOTAL: R${totalAll}`;
+  msg += `\nTOTAL: R${total}`;
 
   window.open(
     "https://wa.me/27764626566?text=" + encodeURIComponent(msg),
     "_blank"
   );
 };
+
 </script>
 
 </body>
